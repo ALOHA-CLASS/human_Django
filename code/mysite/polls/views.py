@@ -18,10 +18,11 @@ def index(request):
 # 설문 뷰
 def detail(request, question_id):
     # question_id 로 데이터 조회
+    # SELECT * FROM question WHERE question_id = ?
     question = get_object_or_404(Question, pk=question_id)
-    
+    context = {'question' : question }
     # 응답할 템플릿을 지정 (detail.html)
-    return render(request, 'polls/detail.html', {'question' : question})
+    return render(request, 'polls/detail.html', context)
     # render()
     # : 요청객체(request)를 지정해주고, 응답할 화면을 지정
     #  HttpResponse 객체를 반환
@@ -35,11 +36,14 @@ def vote(request, question_id):
     # 설문 정보 조회
     question = get_object_or_404(Question, pk=question_id)
     
-    # 선택 항목 등록
-    selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    # 선택 항목 조회
+    choice_id = request.POST['choice']
+    # SELECT * FROM choice WHERER choice_id = ?
+    selected_choice = question.choice_set.get(pk=choice_id)
     # Choice 테이블에서 데이터 조회
     # request.POST['choice']  : POST 방식으로 요청된 요청변수 choice
     
+    # UPDATE choice SET votes = votes + 1 WHERER choice_id = ? 
     selected_choice.votes += 1      # 투표수 1 증가
     selected_choice.save()          # 데이터 저장
     
